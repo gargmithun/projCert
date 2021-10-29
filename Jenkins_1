@@ -17,5 +17,10 @@ pipeline {
         '''
    }   
   }
+  stage('Deploy PHP container') {
+            steps { 
+                sh 'docker container run -d -P mithundockerhub/webapp:20210929.$BUILD_NUMBER'
+            }
+        }
  }
 }
