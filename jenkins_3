@@ -1,0 +1,26 @@
+pipeline {
+ agent none
+ environment {
+  DOCKER = credentials ('dockerhub')
+ }
+ stages {
+ stage('install docker using ansible playbook') {
+   agent { label 'slaveNode ' }
+            steps { 
+                sh 'ansible-playbook dockerinstall-ansible.yaml'
+            }
+        }
+  stage ('create docker image') {
+  agent { label 'slaveNode ' }
+   steps {
+    sh 'sudo docker build -t mithundockerhub/webapp:20210929.$BUILD_NUMBER .'
+   }
+  }
+  stage('Deploy PHP container') {
+   agent { label 'slaveNode ' }
+            steps { 
+                sh 'sudo docker container run -d -P mithundockerhub/webapp:20210929.$BUILD_NUMBER'
+            }
+        }
+ }
+}
