@@ -38,7 +38,7 @@ pipeline {
         }
    post {
     failure {
-      sudo docker rm -f applebite‘
+      sh 'sudo docker rm -f applebite'
             }
         }
  }
