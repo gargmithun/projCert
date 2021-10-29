@@ -1,14 +1,25 @@
 pipeline {
     agent any
+    environment {
+  DOCKER = credentials ('dockerhub')
+ }
     stages {
         stage('Create docker image') {
             steps { 
-                sh 'docker build -t devopsedu/webapp:20211029 .'
+                sh 'docker build -t mithundockerhub/webapp:20211029.$BUILD_NUMBER .'
             }
+        }
+         stage ('CanaryDeploy') {
+   steps {
+     sh '''
+           sudo docker login --username $DOCKER_USR --password $DOCKER_PSW
+           sudo docker push mithundockerhub/train-schedule:20210928.$BUILD_NUMBER
+        '''
+        }
         }
         stage('Deploy PHP container') {
             steps { 
-                sh 'docker container run -d -P devopsedu/webapp:20211029'
+                sh 'docker container run -d -P mithundockerhub/webapp:20211029.$BUILD_NUMBER'
             }
         }
     }
