@@ -1,0 +1,15 @@
+pipeline {
+    agent any
+    stages {
+        stage('Create docker image') {
+            steps { 
+                sh 'docker build -t devopsedu/webapp:20211029 .'
+            }
+        }
+        stage('Deploy PHP container') {
+            steps { 
+                sh 'docker container run -d -P devopsedu/webapp:20211029'
+            }
+        }
+    }
+}
