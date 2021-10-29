@@ -1,0 +1,21 @@
+pipeline {
+ agent any
+ environment {
+  DOCKER = credentials ('dockerhub')
+ }
+ stages {
+  stage ('create docker image') {
+   steps {
+    sh 'sudo docker build -t mithundockerhub/webapp:20210929.$BUILD_NUMBER .'
+   }
+  }
+  stage ('upload image to docker registry') {
+   steps {
+     sh '''
+           sudo docker login --username $DOCKER_USR --password $DOCKER_PSW
+           sudo docker push mithundockerhub/addressbook:20210928.$BUILD_NUMBER
+        '''
+   }   
+  }
+ }
+}
