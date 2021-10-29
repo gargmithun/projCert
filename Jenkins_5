@@ -29,16 +29,17 @@ pipeline {
     sh 'sudo docker build -t mithundockerhub/webapp:20210929.$BUILD_NUMBER .'
    }
   }
-  Try {
+  
   stage('build and deploy your PHP docker container') {
    agent { label 'slaveNode ' }
             steps { 
                 sh 'sudo docker container run -d --name applebite -P mithundockerhub/webapp:20210929.$BUILD_NUMBER'
             }
         }
-      }
-       catch(error) {
-        docker rm -f applebite
-    }   
+   post {
+    failure {
+      sudo docker rm -f applebite‘
+            }
+        }
  }
 }
