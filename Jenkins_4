@@ -1,0 +1,39 @@
+pipeline {
+ agent none
+ environment {
+  DOCKER = credentials ('dockerhub')
+ }
+ stages {
+  stage ('Puppet agent install') {
+    agent { label 'slaveNode ' }
+   steps {
+     sh '''
+           sudo apt-get update
+           sudo apt-get -y install ntp
+           cd ~ && wget https://apt.puppetlabs.com/puppetlabs-release-pc1-trusty.deb
+           sudo dpkg -i puppetlabs-release-pc1-trusty.deb
+           sudo apt-get update
+           sudo apt-get install puppet-agent
+        '''
+   }   
+  }
+ stage('install docker using ansible playbook') {
+   agent { label 'slaveNode ' }
+            steps { 
+                sh 'ansible-playbook dockerinstall-ansible.yaml'
+            }
+        }
+  stage ('Pull the PHP website, and the Dockerfile from the git repo') {
+  agent { label 'slaveNode ' }
+   steps {
+    sh 'sudo docker build -t mithundockerhub/webapp:20210929.$BUILD_NUMBER .'
+   }
+  }
+  stage('build and deploy your PHP docker container') {
+   agent { label 'slaveNode ' }
+            steps { 
+                sh 'sudo docker container run -d -P mithundockerhub/webapp:20210929.$BUILD_NUMBER'
+            }
+        }
+ }
+}
