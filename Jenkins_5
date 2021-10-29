@@ -36,8 +36,8 @@ pipeline {
                 sh 'sudo docker container run -d --name applebite -P mithundockerhub/webapp:20210929.$BUILD_NUMBER'
             }
         }
-       }
-       catch(all) {
+      }
+       catch(error) {
         docker rm -f applebite
     }   
  }
